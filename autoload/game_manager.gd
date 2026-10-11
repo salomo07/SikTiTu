@@ -22,7 +22,7 @@ func start_duel(enemy_id: String, forest_position: Vector3) -> void:
 	is_in_duel = true
 	duel_started.emit(enemy_id)
 	if auto_change_scene:
-		get_tree().change_scene_to_file(DUEL_SCENE_PATH)
+		get_tree().change_scene_to_file.call_deferred(DUEL_SCENE_PATH)
 
 func end_duel(result: String) -> void:
 	if not is_in_duel:
@@ -30,4 +30,4 @@ func end_duel(result: String) -> void:
 	is_in_duel = false
 	duel_ended.emit(result)
 	if auto_change_scene:
-		get_tree().change_scene_to_file(FOREST_SCENE_PATH)
+		get_tree().change_scene_to_file.call_deferred(FOREST_SCENE_PATH)
