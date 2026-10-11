@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=17 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/exploration/player_3d.tscn" id="1"]
 [ext_resource type="Script" path="res://scripts/exploration/forest_level_config.gd" id="2"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" path="res://scenes/exploration/effects/smoke_effect.tscn" id="4"]
 [ext_resource type="NavigationMesh" path="res://scenes/exploration/forest_nav_mesh.tres" id="5"]
 [ext_resource type="Script" path="res://scripts/exploration/animal_spawner.gd" id="6"]
+[ext_resource type="Script" path="res://scripts/exploration/encounter_trigger.gd" id="7"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_top_color = Color(0.7019, 0.2275, 0, 1)
@@ -45,6 +46,9 @@ height = 4.0
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tree"]
 albedo_color = Color(0.3, 0.18, 0.08, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_trigger"]
+size = Vector3(3, 3, 3)
 
 [node name="ForestLevel" type="Node3D"]
 script = ExtResource("2")
@@ -99,6 +103,13 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1.8, 18)
 
 [node name="Navigation" type="NavigationRegion3D" parent="."]
 navigation_mesh = ExtResource("5")
+
+[node name="EncounterTrigger" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 6)
+script = ExtResource("7")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="EncounterTrigger"]
+shape = SubResource("BoxShape3D_trigger")
 
 [node name="AnimalSpawner" type="Node3D" parent="."]
 script = ExtResource("6")

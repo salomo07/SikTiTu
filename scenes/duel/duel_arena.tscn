@@ -1,11 +1,13 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/duel/fighter_2d.tscn" id="1"]
+[ext_resource type="Script" path="res://scripts/duel/duel_resolution.gd" id="2"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
 size = Vector2(800, 40)
 
 [node name="DuelArena" type="Node2D"]
+script = ExtResource("2")
 
 [node name="Floor" type="StaticBody2D" parent="."]
 position = Vector2(400, 480)
