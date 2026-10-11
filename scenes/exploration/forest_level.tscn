@@ -1,9 +1,11 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/exploration/player_3d.tscn" id="1"]
 [ext_resource type="Script" path="res://scripts/exploration/forest_level_config.gd" id="2"]
 [ext_resource type="PackedScene" path="res://scenes/exploration/effects/fire_effect.tscn" id="3"]
 [ext_resource type="PackedScene" path="res://scenes/exploration/effects/smoke_effect.tscn" id="4"]
+[ext_resource type="NavigationMesh" path="res://scenes/exploration/forest_nav_mesh.tres" id="5"]
+[ext_resource type="Script" path="res://scripts/exploration/animal_spawner.gd" id="6"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
 sky_top_color = Color(0.7019, 0.2275, 0, 1)
@@ -94,6 +96,14 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 1.8, -10)
 
 [node name="SmokeAmbient2" parent="SmokePoints" instance=ExtResource("4")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1.8, 18)
+
+[node name="Navigation" type="NavigationRegion3D" parent="."]
+navigation_mesh = ExtResource("5")
+
+[node name="AnimalSpawner" type="Node3D" parent="."]
+script = ExtResource("6")
+spawn_positions = Array[Vector3]([Vector3(3, 0.5, 3), Vector3(2, 0.5, 6), Vector3(4, 0.5, -3), Vector3(6, 0.5, -2)])
+danger_position = Vector3(8, 0.3, 5)
 
 [node name="Ground" type="StaticBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
