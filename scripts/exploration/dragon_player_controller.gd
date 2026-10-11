@@ -5,26 +5,31 @@ extends CharacterBody3D
 @export var vertical_speed := 7.0
 @export var gravity := 20.0
 @export var turn_speed := 7.0
-@export var model_yaw_deg := 54.5
+@export var model_yaw_deg := 180.0
 @export var model_scale := 0.6
 
 var _anim: AnimationPlayer
 var _roaring := false
+
+@onready var _cam_pivot: Node3D = $CameraPivot
 
 
 func _ready() -> void:
 	var facing := $Facing as Node3D
 	facing.rotation.y = deg_to_rad(model_yaw_deg)
 	facing.scale = Vector3.ONE * model_scale
+	# kamera tidak ikut rotasi badan: WASD selalu relatif layar
+	_cam_pivot.top_level = true
+	_cam_pivot.global_rotation = Vector3.ZERO
 	_anim = find_child("AnimationPlayer", true, false)
 	if _anim == null:
 		push_warning("DragonPlayer: AnimationPlayer tidak ditemukan")
 		return
-	for anim_name in ["Idle", "Walk", "Fly"]:
+	for anim_name in ["Idle", "Walk", "Fly", "Idle_B", "Walk_B", "Fly_Flap", "Fly_Glide"]:
 		if _anim.has_animation(anim_name):
 			_anim.get_animation(anim_name).loop_mode = Animation.LOOP_LINEAR
 	_anim.animation_finished.connect(_on_anim_finished)
-	_play("Idle")
+	_play("Idle_B")
 
 
 func _play(anim_name: String) -> void:
@@ -69,10 +74,17 @@ func _physics_process(delta: float) -> void:
 
 	if not _roaring:
 		if not is_on_floor():
-			_play("Fly")
+			# meluncur saat turun, mengepak saat naik/jelajah
+			if descend or (velocity.y < -1.0 and not ascend):
+				_play("Fly_Glide")
+			else:
+				_play("Fly_Flap")
 		elif dir.length_squared() > 0.01:
-			_play("Walk")
+			_play("Walk_B")
 		else:
-			_play("Idle")
+			_play("Idle_B")
 
 	move_and_slide()
+
+	_cam_pivot.global_position = global_position + Vector3(0, 3.2, 0)
+	_cam_pivot.global_rotation = Vector3.ZERO
