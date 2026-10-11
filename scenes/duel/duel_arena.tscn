@@ -1,0 +1,32 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="PackedScene" path="res://scenes/duel/fighter_2d.tscn" id="1"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
+size = Vector2(800, 40)
+
+[node name="DuelArena" type="Node2D"]
+
+[node name="Floor" type="StaticBody2D" parent="."]
+position = Vector2(400, 480)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor"]
+shape = SubResource("RectangleShape2D_floor")
+
+[node name="ColorRect" type="ColorRect" parent="Floor"]
+offset_left = -400.0
+offset_top = -20.0
+offset_right = 400.0
+offset_bottom = 20.0
+color = Color(0.2, 0.15, 0.1, 1)
+
+[node name="PlayerFighter" parent="." instance=ExtResource("1")]
+position = Vector2(150, 420)
+
+[node name="OpponentFighter" parent="." instance=ExtResource("1")]
+position = Vector2(650, 420)
+input_enabled = false
+
+[node name="ArenaCamera" type="Camera2D" parent="."]
+position = Vector2(400, 300)
+current = true
