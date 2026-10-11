@@ -1,0 +1,36 @@
+[gd_scene load_steps=4 format=3]
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_fire"]
+direction = Vector3(0, 1, 0)
+spread = 20.0
+initial_velocity_min = 1.0
+initial_velocity_max = 2.0
+gravity = Vector3(0, 0.5, 0)
+scale_min = 0.2
+scale_max = 0.5
+color = Color(1, 0.4157, 0, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fire"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(1, 0.4157, 0, 1)
+emission_enabled = true
+emission = Color(1, 0.4157, 0, 1)
+emission_energy_multiplier = 2.0
+
+[sub_resource type="QuadMesh" id="QuadMesh_fire"]
+material = SubResource("StandardMaterial3D_fire")
+size = Vector2(0.3, 0.3)
+
+[node name="FireEffect" type="Node3D"]
+
+[node name="FireParticles" type="GPUParticles3D" parent="."]
+amount = 32
+lifetime = 1.0
+process_material = SubResource("ParticleProcessMaterial_fire")
+draw_pass_1 = SubResource("QuadMesh_fire")
+
+[node name="FireLight" type="OmniLight3D" parent="."]
+light_color = Color(1, 0.549, 0, 1)
+light_energy = 2.0
+omni_range = 6.0
