@@ -1,6 +1,27 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/exploration/player_3d.tscn" id="1"]
+[ext_resource type="Script" path="res://scripts/exploration/forest_level_config.gd" id="2"]
+[ext_resource type="PackedScene" path="res://scenes/exploration/effects/fire_effect.tscn" id="3"]
+[ext_resource type="PackedScene" path="res://scenes/exploration/effects/smoke_effect.tscn" id="4"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_1"]
+sky_top_color = Color(0.7019, 0.2275, 0, 1)
+sky_horizon_color = Color(1, 0.4784, 0.102, 1)
+ground_bottom_color = Color(0.1686, 0.1412, 0.1255, 1)
+ground_horizon_color = Color(0.8196, 0.349, 0.102, 1)
+
+[sub_resource type="Sky" id="Sky_1"]
+sky_material = SubResource("ProceduralSkyMaterial_1")
+
+[sub_resource type="Environment" id="Environment_1"]
+background_mode = 2
+sky = SubResource("Sky_1")
+ambient_light_source = 3
+ambient_light_energy = 0.6
+fog_enabled = true
+fog_light_color = Color(0.5412, 0.4196, 0.3333, 1)
+fog_density = 0.015
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_ground"]
 size = Vector3(100, 1, 100)
@@ -24,6 +45,55 @@ height = 4.0
 albedo_color = Color(0.3, 0.18, 0.08, 1)
 
 [node name="ForestLevel" type="Node3D"]
+script = ExtResource("2")
+
+[node name="Environment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_1")
+
+[node name="SunLight" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.819152, 0.573576, 0, -0.573576, 0.819152, 0, 10, 0)
+light_color = Color(1, 0.6471, 0.349, 1)
+light_energy = 0.7
+
+[node name="FirePoints" type="Node3D" parent="."]
+
+[node name="FirePoint1" parent="FirePoints" instance=ExtResource("3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 0.3, 5)
+
+[node name="FirePoint2" parent="FirePoints" instance=ExtResource("3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 0.3, 3)
+
+[node name="FirePoint3" parent="FirePoints" instance=ExtResource("3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 0.3, -5)
+
+[node name="FirePoint4" parent="FirePoints" instance=ExtResource("3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 0.3, -7)
+
+[node name="FirePoint5" parent="FirePoints" instance=ExtResource("3")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 0.3, -1)
+
+[node name="SmokePoints" type="Node3D" parent="."]
+
+[node name="SmokePoint1" parent="SmokePoints" instance=ExtResource("4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 1.8, 5)
+
+[node name="SmokePoint2" parent="SmokePoints" instance=ExtResource("4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 1.8, 3)
+
+[node name="SmokePoint3" parent="SmokePoints" instance=ExtResource("4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12, 1.8, -5)
+
+[node name="SmokePoint4" parent="SmokePoints" instance=ExtResource("4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8, 1.8, -7)
+
+[node name="SmokePoint5" parent="SmokePoints" instance=ExtResource("4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15, 1.8, -1)
+
+[node name="SmokeAmbient1" parent="SmokePoints" instance=ExtResource("4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15, 1.8, -10)
+
+[node name="SmokeAmbient2" parent="SmokePoints" instance=ExtResource("4")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1.8, 18)
 
 [node name="Ground" type="StaticBody3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
