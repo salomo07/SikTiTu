@@ -33,3 +33,32 @@ func test_start_duel_is_ignored_while_already_in_duel():
 
 	assert_eq(game_manager.current_enemy_id, "wolf_01", "second start_duel call must be ignored while a duel is active")
 	assert_eq(game_manager.player_forest_position, Vector3(1, 0, 1))
+
+func test_end_duel_marks_enemy_as_resolved():
+	game_manager.start_duel("wolf_01", Vector3.ZERO)
+	game_manager.end_duel("win")
+
+	assert_true(game_manager.resolved_enemy_ids.has("wolf_01"))
+
+func test_start_duel_is_ignored_for_already_resolved_enemy():
+	game_manager.start_duel("wolf_01", Vector3.ZERO)
+	game_manager.end_duel("win")
+
+	game_manager.start_duel("wolf_01", Vector3(2, 0, 2))
+
+	assert_false(game_manager.is_in_duel, "a resolved encounter must not start a new duel")
+
+func test_end_duel_sets_pending_restore_to_the_captured_position():
+	var test_position := Vector3(3, 0, 4)
+	game_manager.start_duel("wolf_01", test_position)
+	game_manager.end_duel("win")
+
+	assert_true(game_manager.has_pending_restore())
+	assert_eq(game_manager.consume_pending_restore_position(), test_position)
+
+func test_consume_pending_restore_position_clears_the_pending_flag():
+	game_manager.start_duel("wolf_01", Vector3(3, 0, 4))
+	game_manager.end_duel("win")
+	game_manager.consume_pending_restore_position()
+
+	assert_false(game_manager.has_pending_restore())

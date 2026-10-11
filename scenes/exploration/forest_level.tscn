@@ -48,7 +48,7 @@ height = 4.0
 albedo_color = Color(0.3, 0.18, 0.08, 1)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_trigger"]
-size = Vector3(3, 3, 3)
+size = Vector3(10, 3, 4)
 
 [node name="ForestLevel" type="Node3D"]
 script = ExtResource("2")
@@ -105,7 +105,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1.8, 18)
 navigation_mesh = ExtResource("5")
 
 [node name="EncounterTrigger" type="Area3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 6)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -6)
 script = ExtResource("7")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="EncounterTrigger"]

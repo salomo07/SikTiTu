@@ -7,15 +7,20 @@ var player_forest_position: Vector3 = Vector3.ZERO
 var player_hp: int = 100
 var current_enemy_id: String = ""
 var is_in_duel: bool = false
+var resolved_enemy_ids: Array[String] = []
 
 ## Set to false in tests to verify state changes without triggering real scene loads.
 var auto_change_scene: bool = true
+
+var _has_pending_restore: bool = false
 
 const FOREST_SCENE_PATH := "res://scenes/exploration/forest_level.tscn"
 const DUEL_SCENE_PATH := "res://scenes/duel/duel_arena.tscn"
 
 func start_duel(enemy_id: String, forest_position: Vector3) -> void:
 	if is_in_duel:
+		return
+	if resolved_enemy_ids.has(enemy_id):
 		return
 	current_enemy_id = enemy_id
 	player_forest_position = forest_position
@@ -28,6 +33,15 @@ func end_duel(result: String) -> void:
 	if not is_in_duel:
 		return
 	is_in_duel = false
+	resolved_enemy_ids.append(current_enemy_id)
+	_has_pending_restore = true
 	duel_ended.emit(result)
 	if auto_change_scene:
 		get_tree().change_scene_to_file.call_deferred(FOREST_SCENE_PATH)
+
+func has_pending_restore() -> bool:
+	return _has_pending_restore
+
+func consume_pending_restore_position() -> Vector3:
+	_has_pending_restore = false
+	return player_forest_position
