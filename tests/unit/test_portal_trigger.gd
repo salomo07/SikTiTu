@@ -13,7 +13,7 @@ func after_each():
 	GameManager.auto_change_scene = true
 
 func _make_trigger_and_player(enemy_id: String):
-	var trigger = load("res://scripts/exploration/encounter_trigger.gd").new()
+	var trigger = load("res://scripts/exploration/portal_trigger.gd").new()
 	trigger.enemy_id = enemy_id
 	var player := Node3D.new()
 	player.add_to_group("player")
@@ -38,5 +38,15 @@ func test_trigger_does_not_restart_a_resolved_encounter():
 	var player = pair[1]
 
 	trigger._on_body_entered(player)
+
+	assert_false(GameManager.is_in_duel)
+
+func test_trigger_ignores_non_player_bodies():
+	var pair = _make_trigger_and_player("wolf_01")
+	var trigger = pair[0]
+	var not_player := Node3D.new()
+	add_child_autofree(not_player)
+
+	trigger._on_body_entered(not_player)
 
 	assert_false(GameManager.is_in_duel)

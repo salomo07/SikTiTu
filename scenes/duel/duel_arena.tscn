@@ -32,3 +32,12 @@ input_enabled = false
 [node name="ArenaCamera" type="Camera2D" parent="."]
 position = Vector2(400, 300)
 current = true
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="InstructionsLabel" type="Label" parent="HUD"]
+offset_left = 16.0
+offset_top = 16.0
+offset_right = 500.0
+offset_bottom = 40.0
+text = "J / K: Serang (menang sementara)   ·   ESC: Kabur dari duel"

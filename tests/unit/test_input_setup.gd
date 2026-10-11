@@ -3,7 +3,7 @@ extends GutTest
 const ACTIONS := [
 	"move_forward", "move_back", "move_left", "move_right",
 	"duel_left", "duel_right", "duel_jump", "duel_crouch",
-	"duel_skill_1", "duel_skill_2",
+	"duel_skill_1", "duel_skill_2", "duel_flee",
 ]
 
 func before_each():

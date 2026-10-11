@@ -1,0 +1,73 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/exploration/animal_flee_controller.gd" id="1"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+radius = 0.3
+height = 0.8
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_body"]
+radius = 0.14
+height = 0.5
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_musang"]
+albedo_color = Color(0.32, 0.28, 0.26, 1)
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_snout"]
+radius = 0.07
+height = 0.2
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_tail"]
+radius = 0.05
+height = 0.55
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_leg"]
+radius = 0.04
+height = 0.14
+
+[node name="Musang" type="CharacterBody3D" groups=["animal"]]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("1")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape3D_body")
+
+[node name="NavigationAgent3D" type="NavigationAgent3D" parent="."]
+
+[node name="Body" type="Node3D" parent="."]
+
+[node name="Torso" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0.18, 0)
+mesh = SubResource("CapsuleMesh_body")
+surface_material_override/0 = SubResource("StandardMaterial3D_musang")
+
+[node name="Snout" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0.17, 0.33)
+mesh = SubResource("CapsuleMesh_snout")
+surface_material_override/0 = SubResource("StandardMaterial3D_musang")
+
+[node name="Tail" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 0, -1, 0, 1, 0, 0, 0.16, -0.42)
+mesh = SubResource("CapsuleMesh_tail")
+surface_material_override/0 = SubResource("StandardMaterial3D_musang")
+
+[node name="LegFrontLeft" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.07, 0.14)
+mesh = SubResource("CapsuleMesh_leg")
+surface_material_override/0 = SubResource("StandardMaterial3D_musang")
+
+[node name="LegFrontRight" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.07, 0.14)
+mesh = SubResource("CapsuleMesh_leg")
+surface_material_override/0 = SubResource("StandardMaterial3D_musang")
+
+[node name="LegBackLeft" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.12, 0.07, -0.16)
+mesh = SubResource("CapsuleMesh_leg")
+surface_material_override/0 = SubResource("StandardMaterial3D_musang")
+
+[node name="LegBackRight" type="MeshInstance3D" parent="Body"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.12, 0.07, -0.16)
+mesh = SubResource("CapsuleMesh_leg")
+surface_material_override/0 = SubResource("StandardMaterial3D_musang")

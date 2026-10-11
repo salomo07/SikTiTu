@@ -14,6 +14,10 @@ func register_actions() -> void:
 	_add_action_with_key("duel_crouch", KEY_DOWN)
 	_add_action_with_key("duel_skill_1", KEY_J)
 	_add_action_with_key("duel_skill_2", KEY_K)
+	_add_action_with_key("duel_flee", KEY_ESCAPE)
+	_add_action_with_key("dragon_fly_up", KEY_SPACE)
+	_add_action_with_key("dragon_descend", KEY_SHIFT)
+	_add_action_with_key("dragon_roar", KEY_R)
 
 func _add_action_with_key(action_name: String, keycode: Key) -> void:
 	if InputMap.has_action(action_name):
