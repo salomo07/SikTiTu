@@ -3,7 +3,12 @@ class_name FighterState
 
 enum State {IDLE, WALK, JUMP, CROUCH, ATTACK, HIT}
 
-var current_state: State = State.IDLE
+# NOTE: the public API below is typed `int`, not `State`. GDScript treats a
+# script-local enum type (`State`) as distinct from the same enum accessed from
+# another file as `FighterState.State`, which makes cross-file calls fail to
+# type-check (verified on Godot 4.7.2). Enums are ints, so `int` accepts the
+# `FighterState.State.*` values callers pass while keeping the named constants.
+var current_state: int = State.IDLE
 
 const VALID_TRANSITIONS := {
 	State.IDLE: [State.WALK, State.JUMP, State.CROUCH, State.ATTACK, State.HIT],
@@ -14,12 +19,12 @@ const VALID_TRANSITIONS := {
 	State.HIT: [State.IDLE],
 }
 
-signal state_changed(previous: State, next: State)
+signal state_changed(previous: int, next: int)
 
-func can_transition_to(next_state: State) -> bool:
+func can_transition_to(next_state: int) -> bool:
 	return VALID_TRANSITIONS[current_state].has(next_state)
 
-func transition_to(next_state: State) -> bool:
+func transition_to(next_state: int) -> bool:
 	if not can_transition_to(next_state):
 		return false
 	var previous := current_state

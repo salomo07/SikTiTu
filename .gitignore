@@ -14,3 +14,11 @@ data_*/
 # System/IDE
 .DS_Store
 Thumbs.db
+
+assets/kfm/*
+fight/*
+# Environment / secrets
+.env
+.env.*
+*.pem
+*.key

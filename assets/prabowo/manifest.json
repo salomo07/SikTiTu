@@ -1,0 +1,64 @@
+{
+  "canvas": [
+    120,
+    150
+  ],
+  "axis": [
+    60,
+    149
+  ],
+  "anims": {
+    "hurt": {
+      "frames": 4,
+      "durs": [
+        5,
+        5,
+        5,
+        5
+      ],
+      "loop": false
+    },
+    "idle": {
+      "frames": 4,
+      "durs": [
+        5,
+        5,
+        5,
+        5
+      ],
+      "loop": true
+    },
+    "run": {
+      "frames": 4,
+      "durs": [
+        5,
+        5,
+        5,
+        5
+      ],
+      "loop": true
+    },
+    "walk_back": {
+      "frames": 5,
+      "durs": [
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "loop": true
+    },
+    "walk_fwd": {
+      "frames": 5,
+      "durs": [
+        5,
+        5,
+        5,
+        5,
+        5
+      ],
+      "loop": true
+    }
+  }
+}

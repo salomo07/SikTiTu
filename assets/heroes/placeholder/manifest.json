@@ -1,0 +1,194 @@
+{
+  "canvas": [
+    137,
+    148
+  ],
+  "axis": [
+    68,
+    147
+  ],
+  "anims": {
+    "crouch": {
+      "frames": 1,
+      "durs": [
+        5
+      ],
+      "loop": true
+    },
+    "crouch_hk": {
+      "frames": 1,
+      "durs": [
+        5
+      ],
+      "loop": false
+    },
+    "crouch_lk": {
+      "frames": 1,
+      "durs": [
+        5
+      ],
+      "loop": false
+    },
+    "crouch_lp": {
+      "frames": 1,
+      "durs": [
+        5
+      ],
+      "loop": false
+    },
+    "crouch_mp": {
+      "frames": 1,
+      "durs": [
+        5
+      ],
+      "loop": false
+    },
+    "getup": {
+      "frames": 1,
+      "durs": [
+        5
+      ],
+      "loop": false
+    },
+    "guard": {
+      "frames": 1,
+      "durs": [
+        5
+      ],
+      "loop": true
+    },
+    "guard_crouch": {
+      "frames": 1,
+      "durs": [
+        5
+      ],
+      "loop": true
+    },
+    "hurt": {
+      "frames": 1,
+      "durs": [
+        5
+      ],
+      "loop": false
+    },
+    "hurt_low": {
+      "frames": 1,
+      "durs": [
+        5
+      ],
+      "loop": false
+    },
+    "idle": {
+      "frames": 1,
+      "durs": [
+        5
+      ],
+      "loop": true
+    },
+    "jump": {
+      "frames": 1,
+      "durs": [
+        5
+      ],
+      "loop": false
+    },
+    "knee": {
+      "frames": 1,
+      "durs": [
+        5
+      ],
+      "loop": false
+    },
+    "knockdown": {
+      "frames": 1,
+      "durs": [
+        5
+      ],
+      "loop": false
+    },
+    "palm": {
+      "frames": 1,
+      "durs": [
+        5
+      ],
+      "loop": false
+    },
+    "run": {
+      "frames": 1,
+      "durs": [
+        5
+      ],
+      "loop": true
+    },
+    "stand_hk": {
+      "frames": 1,
+      "durs": [
+        5
+      ],
+      "loop": false
+    },
+    "stand_hp": {
+      "frames": 1,
+      "durs": [
+        5
+      ],
+      "loop": false
+    },
+    "stand_lk": {
+      "frames": 1,
+      "durs": [
+        5
+      ],
+      "loop": false
+    },
+    "stand_lp": {
+      "frames": 1,
+      "durs": [
+        5
+      ],
+      "loop": false
+    },
+    "stand_mk": {
+      "frames": 1,
+      "durs": [
+        5
+      ],
+      "loop": false
+    },
+    "stand_mp": {
+      "frames": 1,
+      "durs": [
+        5
+      ],
+      "loop": false
+    },
+    "throw": {
+      "frames": 1,
+      "durs": [
+        5
+      ],
+      "loop": false
+    },
+    "upper": {
+      "frames": 1,
+      "durs": [
+        5
+      ],
+      "loop": false
+    },
+    "walk_back": {
+      "frames": 1,
+      "durs": [
+        5
+      ],
+      "loop": true
+    },
+    "walk_fwd": {
+      "frames": 1,
+      "durs": [
+        5
+      ],
+      "loop": true
+    }
+  }
+}
