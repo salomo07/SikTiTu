@@ -14,3 +14,6 @@ data_*/
 # System/IDE
 .DS_Store
 Thumbs.db
+
+# secret lokal (client id/secret Google) — jangan commit
+.env
