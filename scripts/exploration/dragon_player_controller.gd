@@ -7,11 +7,22 @@ extends CharacterBody3D
 @export var turn_speed := 7.0
 @export var model_yaw_deg := 180.0
 @export var model_scale := 0.6
+@export var active := true
+@export var zoom_min := 4.0
+@export var zoom_max := 25.0
+@export var zoom_step := 1.5
+@export var orbit_sens := 0.006
+@export var pitch_min := -1.5
+@export var pitch_max := 1.5
 
 var _anim: AnimationPlayer
 var _roaring := false
+var _yaw := 0.0
+var _pitch := 0.3
+var _roll := 0.0
 
 @onready var _cam_pivot: Node3D = $CameraPivot
+@onready var _spring: SpringArm3D = $CameraPivot/SpringArm3D
 
 
 func _ready() -> void:
@@ -32,6 +43,27 @@ func _ready() -> void:
 	_play("Idle_B")
 
 
+func set_active(on: bool) -> void:
+	active = on
+	($CameraPivot/SpringArm3D/Camera3D as Camera3D).current = on
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not active:
+		return
+	if event is InputEventMouseButton and event.pressed and _spring:
+		if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+			_spring.spring_length = clampf(_spring.spring_length - zoom_step, zoom_min, zoom_max)
+		elif event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+			_spring.spring_length = clampf(_spring.spring_length + zoom_step, zoom_min, zoom_max)
+	elif event is InputEventMouseMotion:
+		if Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT):
+			_yaw -= event.relative.x * orbit_sens
+			_pitch = clampf(_pitch - event.relative.y * orbit_sens, pitch_min, pitch_max)
+		elif Input.is_mouse_button_pressed(MOUSE_BUTTON_MIDDLE):
+			_roll += event.relative.x * orbit_sens
+
+
 func _play(anim_name: String) -> void:
 	if _anim == null:
 		return
@@ -45,12 +77,12 @@ func _on_anim_finished(anim_name: StringName) -> void:
 
 
 func _physics_process(delta: float) -> void:
-	var input_dir := Input.get_vector("move_left", "move_right", "move_forward", "move_back")
-	var dir := Vector3(input_dir.x, 0.0, input_dir.y)
-	var ascend := Input.is_action_pressed("dragon_fly_up")
-	var descend := Input.is_action_pressed("dragon_descend")
+	var input_dir := Input.get_vector("move_left", "move_right", "move_forward", "move_back") if active else Vector2.ZERO
+	var dir := Vector3(input_dir.x, 0.0, input_dir.y).rotated(Vector3.UP, _yaw)
+	var ascend := active and Input.is_action_pressed("dragon_fly_up")
+	var descend := active and Input.is_action_pressed("dragon_descend")
 
-	if Input.is_action_just_pressed("dragon_roar") and not _roaring and _anim != null:
+	if active and Input.is_action_just_pressed("dragon_roar") and not _roaring and _anim != null:
 		if _anim.has_animation("FireBreath"):
 			_roaring = true
 			_anim.play("FireBreath", 0.15)
@@ -87,4 +119,4 @@ func _physics_process(delta: float) -> void:
 	move_and_slide()
 
 	_cam_pivot.global_position = global_position + Vector3(0, 3.2, 0)
-	_cam_pivot.global_rotation = Vector3.ZERO
+	_cam_pivot.global_rotation = Vector3(_pitch, _yaw, _roll)

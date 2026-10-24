@@ -6,6 +6,7 @@ const ANIMAL_VARIANTS: Array[PackedScene] = [
 	preload("res://scenes/exploration/animals/snake.tscn"),
 	preload("res://scenes/exploration/animals/monkey.tscn"),
 	preload("res://scenes/exploration/animals/musang.tscn"),
+	preload("res://scenes/exploration/animals/fox.tscn"),
 ]
 
 @export var spawn_positions: Array[Vector3] = []

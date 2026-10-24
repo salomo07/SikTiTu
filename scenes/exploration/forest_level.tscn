@@ -1,4 +1,4 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=17 format=3]
 
 [ext_resource type="PackedScene" path="res://scenes/exploration/dragon_player.tscn" id="1"]
 [ext_resource type="Script" path="res://scripts/exploration/hex_terrain.gd" id="10"]
@@ -9,6 +9,8 @@
 [ext_resource type="NavigationMesh" path="res://scenes/exploration/forest_nav_mesh.tres" id="5"]
 [ext_resource type="Script" path="res://scripts/exploration/animal_spawner.gd" id="6"]
 [ext_resource type="PackedScene" path="res://scenes/exploration/portal.tscn" id="7"]
+[ext_resource type="PackedScene" path="res://scenes/exploration/prabowo_player.tscn" id="12"]
+[ext_resource type="Script" path="res://scripts/exploration/player_switcher.gd" id="13"]
 
 [sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_1"]
 panorama = ExtResource("11")
@@ -107,5 +109,12 @@ script = ExtResource("10")
 
 [node name="Player3D" parent="." instance=ExtResource("1")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="PrabowoPlayer" parent="." instance=ExtResource("12")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 1, 4)
+
+[node name="PlayerSwitcher" type="Node" parent="."]
+script = ExtResource("13")
+players = Array[NodePath]([NodePath("../Player3D"), NodePath("../PrabowoPlayer")])
 
 [node name="Trees" type="Node3D" parent="."]
