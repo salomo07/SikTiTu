@@ -128,7 +128,7 @@ func _apply_preview(s: AnimatedSprite2D, d: CharacterDef, flip: bool) -> void:
 	s.visible = true
 	var frames: SpriteFrames = d.frames if d.frames != null else KfmFrames.get_frames()
 	var ax: Vector2 = d.axis if d.frames != null else KfmFrames.axis
-	var scale := (1.6 if d.frames == null else d.sprite_scale * 1.6)
+	var scale := (1.2 if d.frames == null else d.sprite_scale * 1.2)
 	if frames != null:
 		s.sprite_frames = frames
 		if frames.has_animation("idle"):
@@ -146,8 +146,8 @@ func _make_preview(center: Vector2) -> AnimatedSprite2D:
 	add_child(s)
 	# kotak portrait (wajah) — dipakai bila karakter punya portrait_path
 	var pt := TextureRect.new()
-	pt.size = Vector2(200, 210)
-	pt.position = center - Vector2(100, 215)   # bagian bawah sejajar titik kaki pratinjau
+	pt.size = Vector2(140, 150)
+	pt.position = center - Vector2(70, 160)   # bagian bawah sejajar titik kaki pratinjau
 	pt.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
 	pt.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	pt.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST

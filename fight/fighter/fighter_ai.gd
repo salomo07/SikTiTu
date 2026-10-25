@@ -42,7 +42,7 @@ func _block_chance() -> float:
 func think(me, foe) -> Dictionary:
 	wants_block = false
 	var cmd := {"move": 0.0, "jump": false, "crouch": false, "block": false,
-		"attack": "", "skill": -1}
+		"attack": "", "skill": -1, "run": false}
 	if foe == null:
 		return cmd
 
@@ -75,6 +75,8 @@ func think(me, foe) -> Dictionary:
 		Intent.APPROACH:
 			if dist > 95.0:
 				cmd["move"] = dir_to_foe
+				# jauh sekali → lari mendekat (berhenti lari saat sudah dekat agar tak menabrak)
+				cmd["run"] = dist > 300.0
 			else:
 				_intent = Intent.ATTACK
 		Intent.RETREAT:

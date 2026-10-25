@@ -17,6 +17,59 @@ func test_asian_tiger_has_four_skills():
 	for k in ["bad_word", "joget_gemoy", "kucing_asia", "monokotil"]:
 		assert_true(d.skills.has(k), "punya skill %s" % k)
 
+func test_asian_tiger_movement_anims():
+	# sprite jalan/lari/jatuh hasil potongan ulang sheet combat
+	var d := CharacterRegistry.get_def("asian_tiger")
+	assert_not_null(d.frames, "frames tiger termuat")
+	if d.frames == null:
+		return
+	for a in ["walk_fwd", "walk_back", "run", "down", "knockdown", "getup", "lk", "hk"]:
+		assert_true(d.frames.has_animation(a), "anim %s ada" % a)
+	assert_eq(d.frames.get_frame_count("walk_fwd"), 4, "siklus jalan 4 frame")
+	assert_eq(d.frames.get_frame_count("run"), 2, "lari 2 frame")
+	assert_eq(d.frames.get_frame_count("knockdown"), 3, "jatuh 3 frame")
+	assert_true(d.anims.has("run") and d.anims.has("down"), "pemetaan run/down ada")
+	# semua pose skill dari sheet terpakai: tiap skill punya anim kuda-kuda/aktif/pemulihan
+	for sk in d.skills.values():
+		for key in ["anim", "anim_active", "anim_recovery"]:
+			assert_true(sk.has(key), "skill %s punya %s" % [sk["name"], key])
+			if sk.has(key):
+				assert_true(d.frames.has_animation(sk[key]), "anim %s ada di frames" % sk[key])
+	assert_eq(d.frames.get_frame_count("kucing_start"), 3, "Transformation Start→Effect→Cat Form")
+	assert_eq(d.frames.get_frame_count("kucing_end"), 3, "Collision→Recovery (Cat)→Return to Human")
+	assert_eq(d.frames.get_frame_count("joget_start"), 5, "Start Dance + Dance 1–4")
+	for fx in ["quake_burst", "seed_break", "frag_scatter", "frag_burst", "dust_1", "dust_2", "dust_3"]:
+		assert_true(ResourceLoader.exists("res://assets/characters/asian_tiger/fx/%s.png" % fx), "fx %s ada" % fx)
+
+func test_kolonel_character():
+	assert_true(CharacterRegistry.ids().has("kolonel"), "Mr. Kol-Onel terdaftar")
+	var d := CharacterRegistry.get_def("kolonel")
+	assert_eq(d.display_name, "Mr. Kol-Onel")
+	for k in ["pokoknya_ada", "beasts_smile", "macho", "bobo_yuk"]:
+		assert_true(d.skills.has(k), "punya skill %s" % k)
+	assert_true(d.skills["bobo_yuk"].has("dash_speed"), "Bobo Yuk melayang (dash)")
+	assert_eq(d.skills["pokoknya_ada"].get("hit_text", ""), "-999")
+	assert_not_null(d.frames, "frames Kol-Onel termuat")
+	if d.frames == null:
+		return
+	for a in ["idle", "walk_fwd", "run", "jump", "block", "hit", "knockdown", "down", "getup",
+			"lp", "hp", "lk", "pokok_start", "pokok_fire", "beast_start", "beast_pose",
+			"macho_start", "macho_pose", "bobo_start", "bobo_fly", "bobo_end"]:
+		assert_true(d.frames.has_animation(a), "anim %s ada" % a)
+	assert_eq(d.frames.get_frame_count("beast_start"), 3, "duduk → gigit bibir → kacamata")
+	assert_true(ResourceLoader.exists(d.portrait_path), "portrait ada")
+	for fx in ["beam", "halo", "heart"]:
+		assert_true(ResourceLoader.exists("res://assets/characters/kolonel/fx/%s.png" % fx), "fx %s ada" % fx)
+
+func test_bad_word_text_is_godot_rendered():
+	# kata makian dirender Godot (Label), bukan sprite — agar tajam saat besar
+	var n: Node2D = FightEffects._word_node(0)
+	var labels := n.find_children("*", "Label", true, false)
+	assert_eq(labels.size(), 2, "dua lapis Label (outline hitam + isi kuning)")
+	assert_eq(n.find_children("*", "Sprite2D", true, false).size(), 0, "tanpa Sprite2D")
+	assert_true(FightEffects._word_hit_size(3).x > FightEffects._word_hit_size(1).x, "kotak tabrak ikut panjang kata")
+	n.free()
+
 func test_characters_have_basic_normals():
 	for id in CharacterRegistry.ids():
 		var d := CharacterRegistry.get_def(id)

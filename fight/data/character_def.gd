@@ -37,6 +37,8 @@ var anims := {
 	"hit_low": "hurt_low",
 	"knockdown": "knockdown",
 	"getup": "getup",
+	"run": "run",           # lari maju (ketuk maju 2× lalu tahan)
+	"down": "down",         # tergeletak setelah knockdown (opsional; KFM tak punya → tetap frame terakhir knockdown)
 }
 
 ## Normal attacks: id -> data. Timing dalam detik.

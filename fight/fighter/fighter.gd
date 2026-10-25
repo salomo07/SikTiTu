@@ -41,6 +41,16 @@ var _hit_done := false                    # satu hit per activation
 var _hitstun_t := 0.0
 var _down_t := 0.0
 var _block_t := 0.0
+var _landed_down := false                 # sudah memutar anim "down" setelah jatuh?
+var _stun_fx: Node = null                 # bintang berputar saat terpaku (stun) oleh skill
+const STUN_TINT := Color(0.72, 0.76, 1.0) # sprite memucat kebiruan selama stun
+
+# lari: ketuk maju dua kali (< RUN_TAP_WINDOW) lalu tahan → kecepatan × RUN_MULT, anim "run"
+const RUN_TAP_WINDOW := 0.3
+const RUN_MULT := 1.7
+var _run_tap_t := 0.0                     # sisa jendela ketuk ganda
+var _run_tap_dir := 0                     # arah ketukan pertama
+var _running := false
 
 @onready var _sprite: AnimatedSprite2D = $Sprite
 @onready var _hurtbox: Area2D = $Hurtbox
@@ -107,6 +117,9 @@ func _physics_process(delta: float) -> void:
 		velocity.x = move_toward(velocity.x, 0, 2000 * delta)
 		_apply_gravity(delta)
 		move_and_slide()
+		if is_on_floor() and not _landed_down:
+			_landed_down = true
+			_play("down")
 		return
 
 	if frozen:
@@ -159,11 +172,12 @@ func _get_command() -> Dictionary:
 
 func _idle_command() -> Dictionary:
 	return {"move": 0.0, "jump": false, "crouch": false, "block": false,
-		"attack": "", "skill": -1}
+		"attack": "", "skill": -1, "run": false}
 
 func _gather_input() -> Dictionary:
 	var move := Input.get_axis("fight_left", "fight_right")
 	var crouch := Input.is_action_pressed("fight_crouch")
+	_update_run_tap(move)
 	# Block = menahan arah menjauh dari lawan saat berdiri/jongkok.
 	var away := (move < 0 and facing > 0) or (move > 0 and facing < 0)
 	var attack := ""
@@ -178,7 +192,25 @@ func _gather_input() -> Dictionary:
 			break
 	return {"move": move, "jump": Input.is_action_just_pressed("fight_jump"),
 		"crouch": crouch, "block": away and is_on_floor(),
-		"attack": attack, "skill": skill}
+		"attack": attack, "skill": skill, "run": _running}
+
+## Deteksi ketuk-ganda maju (pemain): ketukan kedua ke arah lawan dalam RUN_TAP_WINDOW
+## menyalakan lari; lari berhenti begitu arah dilepas / berbalik.
+func _update_run_tap(move: float) -> void:
+	_run_tap_t = maxf(0.0, _run_tap_t - get_physics_process_delta_time())
+	var dir := int(signf(move)) if absf(move) > 0.1 else 0
+	var toward := dir != 0 and dir == facing
+	if _running and not toward:
+		_running = false
+	var tapped := (dir > 0 and Input.is_action_just_pressed("fight_right")) \
+		or (dir < 0 and Input.is_action_just_pressed("fight_left"))
+	if tapped and toward:
+		if _run_tap_t > 0.0 and _run_tap_dir == dir:
+			_running = true
+			_run_tap_t = 0.0
+		else:
+			_run_tap_dir = dir
+			_run_tap_t = RUN_TAP_WINDOW
 
 # ---------------------------------------------------------------- free state
 func _process_free(delta: float, cmd: Dictionary) -> void:
@@ -201,14 +233,18 @@ func _process_free(delta: float, cmd: Dictionary) -> void:
 			velocity.x = 0
 			_set_state(S.CROUCH)
 			return
-		# jalan
-		velocity.x = cmd["move"] * def.move_speed * scale.x
-		if absf(cmd["move"]) > 0.1:
+		# jalan / lari
+		var mv: float = cmd["move"]
+		var toward: bool = (mv > 0 and facing > 0) or (mv < 0 and facing < 0)
+		var running: bool = toward and bool(cmd.get("run", false)) and _has_anim("run")
+		velocity.x = mv * def.move_speed * scale.x * (RUN_MULT if running else 1.0)
+		if absf(mv) > 0.1:
 			_set_state(S.WALK)
-			# animasi maju/mundur tergantung arah relatif lawan
-			var mv: float = cmd["move"]
-			var toward: bool = (mv > 0 and facing > 0) or (mv < 0 and facing < 0)
-			_play("walk_fwd" if toward else "walk_back")
+			# animasi maju/mundur tergantung arah relatif lawan; lari punya anim sendiri
+			if running:
+				_play("run")
+			else:
+				_play("walk_fwd" if toward else "walk_back")
 		else:
 			_set_state(S.IDLE)
 	else:
@@ -276,6 +312,10 @@ func _begin_action(data: Dictionary, st: int) -> void:
 		_sprite.speed_scale = 0.55
 		var is_ult := bool(data.get("ultimate", false))
 		FightEffects.spawn_windup(_effects_root(), self, _act_t, is_ult)
+		# Bad Word: makian sudah "muncul" di atas kepala selama kuda-kuda, baru dilempar saat aktif
+		if String(data.get("fx", "")) == "bad_word":
+			_act["_word"] = randi() % FightEffects.WORDS.size()
+			FightEffects.spawn_bad_word_charge(_effects_root(), self, _act_t, int(_act["_word"]))
 		var p := get_parent()
 		if p and p.has_method("announce_skill"):
 			p.announce_skill(String(data.get("name", "")), is_ult)
@@ -290,11 +330,16 @@ func _process_action(delta: float) -> void:
 			_act_phase = "active"
 			_act_t = float(_act.get("active", 0.0))
 			_hit_done = false
+			_sprite.speed_scale = 1.0
+			if _act.has("anim_active"):
+				_play(String(_act["anim_active"]), false)
 			_on_action_active()
 		"active":
 			_act_phase = "recovery"
 			_act_t = float(_act.get("recovery", 0.2))
 			_set_hitbox_enabled(false)
+			if _act.has("anim_recovery"):
+				_play(String(_act["anim_recovery"]), false)
 		"recovery":
 			_end_action()
 
@@ -306,8 +351,8 @@ func _on_action_active() -> void:
 	if _act.has("hb"):
 		_set_hitbox_from_data(_act["hb"])
 		_set_hitbox_enabled(true)
-	# Kucing Asia: dash saat aktif.
-	if _act.get("fx", "") == "cat_dash":
+	# Skill dengan dash (Kucing Asia, Bobo Yuk): melesat saat aktif.
+	if _act.has("dash_speed"):
 		velocity.x = facing * float(_act.get("dash_speed", 600.0)) * scale.x
 
 func _end_action() -> void:
@@ -321,15 +366,23 @@ func _end_action() -> void:
 func _fire_skill_effect() -> void:
 	var fx := String(_act.get("fx", ""))
 	var mgr := _effects_root()
+	var stun: float = float(_act.get("stun", 0.0))
 	match fx:
 		"bad_word":
-			FightEffects.spawn_bad_word(mgr, self)
+			FightEffects.spawn_bad_word(mgr, self, stun, int(_act.get("_word", -1)))
 		"quake":
 			FightEffects.spawn_quake(mgr, self)
 		"cat_dash":
 			FightEffects.spawn_cat_aura(mgr, self)
 		"monokotil":
-			FightEffects.spawn_monokotil(mgr, self)
+			FightEffects.spawn_monokotil(mgr, self, stun)
+		# Mr. Kol-Onel
+		"pokok_beam":
+			FightEffects.spawn_pokok_beam(mgr, self, String(_act.get("hit_text", "")))
+		"gaze":
+			FightEffects.spawn_gaze(mgr, self)
+		"bobo_dash":
+			FightEffects.spawn_hearts_trail(self, float(_act.get("active", 0.8)))
 		"launch":
 			pass
 	# gain sedikit screen shake untuk skill berat
@@ -377,6 +430,8 @@ func _update_active_hit() -> void:
 			"launch": float(_act.get("launch", 0.0)),
 			"low": bool(_act.get("low", false)),
 			"from_x": global_position.x,
+			"stun": float(_act.get("stun", 0.0)),
+			"stun_fx": String(_act.get("stun_fx", "")),
 		})
 		_gain_meter(float(_act.get("damage", 10)) * 0.08)   # penyerang dapat meter saat memukul
 		break
@@ -408,6 +463,9 @@ func receive_hit(info: Dictionary) -> void:
 	hp_changed.emit(hp, def.max_hp)
 	_set_hitbox_enabled(false)
 	_sprite.speed_scale = 1.0        # bila terpukul saat kuda-kuda skill, animasi kembali normal
+	if float(info.get("stun", 0.0)) > 0.3:
+		# kena skill: ledakan sprite (Fragments Hit) lebih besar daripada percikan biasa
+		FightEffects.spawn_impact_burst(_effects_root(), global_position + Vector2(0, -80 * scale.x), scale.x)
 	FightEffects.spawn_hit_spark(_effects_root(), global_position + Vector2(0, -90 * scale.x), scale.x)
 	_request_shake(3.0, 0.1)
 
@@ -417,16 +475,38 @@ func receive_hit(info: Dictionary) -> void:
 
 	var launch: float = info.get("launch", 0.0)
 	if launch != 0.0:
+		_clear_stun()
 		velocity.y = launch * scale.x
 		velocity.x = dir * info["knockback"] * 0.4 * scale.x
 		_set_state(S.KNOCKDOWN)
 		_down_t = 0.9
+		_landed_down = false
 		_play("knockdown", false)
 	else:
 		velocity.x = dir * info["knockback"] * scale.x
-		_hitstun_t = 0.28
+		# stun skill: terpaku lebih lama (tak menumpuk — ambil sisa terlama)
+		var stun: float = float(info.get("stun", 0.0))
+		var remain: float = _hitstun_t if state == S.HITSTUN else 0.0
+		_hitstun_t = maxf(remain, maxf(0.28, stun))
 		_set_state(S.HITSTUN)
 		_play("hit_low" if info.get("low", false) else "hit", false)
+		if stun > 0.3:
+			_begin_stun(_hitstun_t, String(info.get("stun_fx", "")) == "halo")
+
+## Visual stun: bintang berputar di atas kepala (+ halo untuk skill Kol-Onel) + sprite memucat.
+func _begin_stun(t: float, halo: bool = false) -> void:
+	_clear_stun()
+	_stun_fx = FightEffects.spawn_stun(_effects_root(), self, t, halo)
+	_sprite.modulate = def.tint * STUN_TINT
+
+func _clear_stun() -> void:
+	if _stun_fx != null and is_instance_valid(_stun_fx):
+		_stun_fx.queue_free()
+	_stun_fx = null
+	_sprite.modulate = def.tint
+
+func is_stunned() -> bool:
+	return state == S.HITSTUN and _stun_fx != null
 
 func _is_holding_block() -> bool:
 	if is_player:
@@ -438,12 +518,19 @@ func _process_hitstun(delta: float) -> void:
 	velocity.x = move_toward(velocity.x, 0, 900 * delta)
 	_hitstun_t -= delta
 	if _hitstun_t <= 0 and is_on_floor():
+		_clear_stun()
 		can_act = true
 		_set_state(S.IDLE)
 
 func _process_knockdown(delta: float) -> void:
 	velocity.x = move_toward(velocity.x, 0, 700 * delta)
 	if is_on_floor():
+		# begitu menyentuh lantai: pose tergeletak ("down") + debu; bila karakter tak punya
+		# anim down, frame terakhir knockdown tetap ditahan.
+		if not _landed_down:
+			_landed_down = true
+			_play("down")
+			FightEffects.spawn_dust(_effects_root(), global_position, scale.x)
 		_down_t -= delta
 		if _down_t <= 0:
 			_set_state(S.GETUP)
@@ -459,7 +546,9 @@ func _process_getup(delta: float) -> void:
 func _die(dir: int, info: Dictionary) -> void:
 	velocity.x = dir * 260.0
 	velocity.y = -300.0
+	_clear_stun()
 	_set_state(S.DEAD)
+	_landed_down = false
 	_play("knockdown", false)
 	ko.emit()
 
@@ -485,6 +574,10 @@ func _update_free_anim(st: int) -> void:
 		S.JUMP: _play("jump", false)
 		# WALK anim diatur di _process_free; ATTACK/SKILL/hit di tempat masing-masing
 
+func _has_anim(state_key: String) -> bool:
+	var anim: String = def.anims.get(state_key, state_key)
+	return _sprite.sprite_frames != null and _sprite.sprite_frames.has_animation(anim)
+
 func _play(state_key: String, loop_override := true) -> void:
 	var anim: String = def.anims.get(state_key, state_key)
 	if _sprite.sprite_frames == null or not _sprite.sprite_frames.has_animation(anim):
@@ -505,6 +598,11 @@ func reset_for_round(spawn_x: float, face: int) -> void:
 	velocity = Vector2.ZERO
 	_act = {}
 	_act_phase = ""
+	_running = false
+	_run_tap_t = 0.0
+	_landed_down = false
+	_hitstun_t = 0.0
+	_clear_stun()
 	_set_hitbox_enabled(false)
 	_sprite.speed_scale = 1.0
 	_set_state(S.IDLE)
